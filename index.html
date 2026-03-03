@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Anoop Abhushan Bhandar — Frame Composer</title>
+<style>
+  :root{
+    --gold1:#f6d365;
+    --gold2:#f2b93f;
+    --accent:#b07a00;
+    --muted:rgba(0,0,0,0.45);
+    --glass: rgba(255,255,255,0.06);
+    --ui-radius:12px;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;color:#111}
+  body{
+    background:
+      radial-gradient(circle at 10% 10%, rgba(255,241,190,0.12), transparent 10%),
+      linear-gradient(180deg,#fffaf0 0%, #fff7ea 40%, #fff6e1 100%);
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:18px;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
+
+  .app{
+    width:100%;
+    max-width:520px;
+    box-shadow:0 8px 30px rgba(15,15,15,0.18);
+    border-radius:16px;
+    overflow:hidden;
+    background:linear-gradient(180deg, rgba(255,255,255,0.75), rgba(255,250,240,0.8));
+  }
+
+  .header{
+    padding:16px 18px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border-bottom:1px solid rgba(0,0,0,0.04);
+    background:linear-gradient(90deg, rgba(255,243,208,0.6), rgba(255,245,220,0.3));
+  }
+  .logo-dot{
+    width:44px;height:44px;border-radius:10px;
+    background:linear-gradient(180deg,var(--gold2),var(--gold1));
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 3px 10px rgba(176,122,0,0.18), inset 0 -6px 8px rgba(255,255,255,0.25);
+    font-weight:700;color:#4b2e00;
+    border:1px solid rgba(0,0,0,0.05);
+  }
+  .title{
+    display:flex;flex-direction:column;
+  }
+  .store{
+    font-weight:800;color:#6b3e00;font-size:15px;letter-spacing:0.2px;
+  }
+  .subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+
+  .content{display:flex;flex-direction:column;gap:12px;padding:14px}
+
+  .canvas-wrap{
+    background:linear-gradient(180deg, rgba(255,250,238,0.9), rgba(255,248,236,0.8));
+    border-radius:12px;
+    padding:10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);
+  }
+
+  /* the visible preview, responsive */
+  .preview{
+    width:100%;
+    max-width:420px;
+    border-radius:8px;
+    overflow:hidden;
+    display:block;
+    position:relative;
+    box-shadow: 0 10px 30px rgba(28,20,6,0.08);
+    border:1px solid rgba(0,0,0,0.05);
+    touch-action:none;
+    -webkit-user-select:none;
+    user-select:none;
+    background:transparent;
+  }
+
+  canvas{
+    width:100%;
+    height:auto;
+    display:block;
+    background:transparent;
+    touch-action:none;
+  }
+
+  .controls{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+    justify-content:center;
+    margin-top:6px;
+  }
+
+  .btn{
+    background:linear-gradient(180deg,var(--gold1),var(--gold2));
+    border:none;
+    padding:10px 12px;
+    border-radius:10px;
+    font-weight:700;
+    color:#381f00;
+    box-shadow:0 4px 8px rgba(176,122,0,0.12);
+    cursor:pointer;
+  }
+  .btn.secondary{
+    background:var(--glass);
+    color:#2b2b2b;
+    font-weight:600;
+    border:1px solid rgba(0,0,0,0.04);
+  }
+  input[type=file]{display:none}
+
+  .row{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+  .small{font-size:12px;color:rgba(0,0,0,0.6)}
+  .slider{width:160px}
+
+  .footer{
+    padding:12px 14px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border-top:1px solid rgba(0,0,0,0.03);
+    background:linear-gradient(180deg, rgba(255,255,255,0.1), transparent);
+  }
+
+  .badge{
+    background:linear-gradient(90deg,#fff6d6,#fde3a0);
+    padding:6px 10px;border-radius:999px;font-weight:700;color:#6b3e00;border:1px solid rgba(0,0,0,0.03)
+  }
+
+  @media (max-width:460px){
+    .slider{width:120px}
+    .title{font-size:13px}
+  }
+
+  /* subtle helper text */
+  .hint{font-size:12px;color:rgba(0,0,0,0.45);text-align:center;margin-top:6px}
+</style>
+</head>
+<body>
+<div class="app" role="application" aria-label="Anoop Abhushan Bhandar Frame composer">
+  <div class="header">
+    <div class="logo-dot">AAB</div>
+    <div class="title">
+      <div class="store">Anoop Abhushan Bhandar</div>
+      <div class="subtitle">Jewellery Hallmark · Personalized frames</div>
+    </div>
+    <div style="margin-left:auto" class="badge">1080 × 1920</div>
+  </div>
+
+  <div class="content">
+    <div class="canvas-wrap">
+      <div class="preview" id="previewWrap">
+        <canvas id="canvas" aria-label="Frame preview"></canvas>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;">
+      <div class="controls">
+        <label for="photoInput" class="btn" id="uploadBtn">Upload Photo</label>
+        <input id="photoInput" type="file" accept="image/*">
+        <button class="btn secondary" id="fitBtn">Fit to window</button>
+        <button class="btn secondary" id="centerBtn">Center</button>
+        <select id="format" class="btn secondary" aria-label="format">
+          <option value="png">PNG (gold bg)</option>
+          <option value="jpg">JPG (gold bg)</option>
+        </select>
+        <button id="downloadBtn" class="btn">Download</button>
+      </div>
+
+      <div class="row" style="align-items:center;">
+        <input id="rotate" type="range" min="-180" max="180" value="0" class="slider">
+        <div class="small" id="valRot">0°</div>
+      </div>
+
+      <div class="hint">Touch: pinch to zoom/rotate, drag to move. Desktop: drag, wheel to zoom, slider to rotate.</div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="small">Made for <strong>Anoop Abhushan Bhandar</strong></div>
+    <div class="small">Tip: upload a high-res photo for best print-quality results</div>
+  </div>
+</div>
+
+<script>
+/*
+  Behavior summary:
+  - frame.png (1080x1920) must sit next to this HTML file
+  - script finds the transparent hole inside frame and uses it to auto-fit the photo
+  - background inside transparent hole and any empty space uses a rich golden gradient
+*/
+
+const FRAME_W = 1080;
+const FRAME_H = 1920;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d', { alpha: true });
+
+// ensure high-DPI crispness
+function setCanvasSize(){
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = FRAME_W * dpr;
+  canvas.height = FRAME_H * dpr;
+  canvas.style.width = Math.min(420, Math.round(window.innerWidth - 48)) + 'px';
+  canvas.style.height = (canvas.width.replace ? '' : '') ; // not used; canvas keeps aspect automatically
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+setCanvasSize();
+window.addEventListener('resize', () => { setCanvasSize(); draw(); });
+
+// load frame (hardcoded)
+const frameImg = new Image();
+frameImg.src = "frame.png";
+let holeRect = null; // {x,y,w,h} in frame pixels (0..FRAME_W/H)
+frameImg.onload = ()=> {
+  // detect transparent region (alpha) to find hole bounding box
+  const tmp = document.createElement('canvas');
+  tmp.width = FRAME_W; tmp.height = FRAME_H;
+  const tctx = tmp.getContext('2d');
+  tctx.drawImage(frameImg,0,0,FRAME_W,FRAME_H);
+  try{
+    const id = tctx.getImageData(0,0,FRAME_W,FRAME_H).data;
+    let minX=FRAME_W, minY=FRAME_H, maxX=0, maxY=0;
+    for(let y=0;y<FRAME_H;y++){
+      for(let x=0;x<FRAME_W;x++){
+        const i = (y*FRAME_W + x)*4 + 3;
+        const a = id[i];
+        if(a < 10){ // transparent or near transparent
+          if(x < minX) minX = x;
+          if(y < minY) minY = y;
+          if(x > maxX) maxX = x;
+          if(y > maxY) maxY = y;
+        }
+      }
+    }
+    if(minX <= maxX && minY <= maxY){
+      holeRect = { x: minX, y: minY, w: maxX-minX+1, h: maxY-minY+1 };
+      // expand a tiny bit for safety
+      holeRect.x = Math.max(0, holeRect.x - 2);
+      holeRect.y = Math.max(0, holeRect.y - 2);
+      holeRect.w = Math.min(FRAME_W - holeRect.x, holeRect.w + 4);
+      holeRect.h = Math.min(FRAME_H - holeRect.y, holeRect.h + 4);
+    } else {
+      holeRect = { x:0, y:0, w:FRAME_W, h:FRAME_H };
+    }
+  } catch(err){
+    // if cross-origin or other error, fall back to center window
+    holeRect = { x:0, y:0, w:FRAME_W, h:FRAME_H };
+  }
+  draw();
+};
+
+// golden background paint (used for preview & output)
+function paintGoldenBackground(ctxRef, w, h){
+  // fancy radial + linear combination to get rich golden tone
+  const g = ctxRef.createLinearGradient(0,0,w, h);
+  g.addColorStop(0, '#fff7e6');
+  g.addColorStop(0.35, '#fef0d1');
+  g.addColorStop(0.8, '#f6d788');
+  g.addColorStop(1, '#f1c95b');
+  ctxRef.fillStyle = g;
+  ctxRef.fillRect(0,0,w,h);
+
+  // soft vignette
+  ctxRef.globalCompositeOperation = 'soft-light';
+  const rg = ctxRef.createRadialGradient(w*0.5, h*0.2, Math.min(w,h)*0.2, w*0.5, h*0.5, Math.max(w,h)*0.9);
+  rg.addColorStop(0, 'rgba(255,255,255,0.08)');
+  rg.addColorStop(1, 'rgba(0,0,0,0.06)');
+  ctxRef.fillStyle = rg;
+  ctxRef.fillRect(0,0,w,h);
+  ctxRef.globalCompositeOperation = 'source-over';
+}
+
+// photo + transform state
+let photoImg = null;
+let scale = 1;
+let rotation = 0; // radians
+let tx = 0, ty = 0; // translation in pixels relative to canvas center
+
+// pointer interaction
+let pointers = new Map();
+let lastSingle = null;
+let gesture = null;
+
+function clientToCanvas(clientX, clientY){
+  const rect = canvas.getBoundingClientRect();
+  const cx = (clientX - rect.left) * (FRAME_W / rect.width);
+  const cy = (clientY - rect.top) * (FRAME_H / rect.height);
+  return { x: cx, y: cy };
+}
+
+function draw(){
+  // main preview draw: draw golden background, photo transformed, then frame overlay
+  ctx.clearRect(0,0,FRAME_W,FRAME_H);
+  paintGoldenBackground(ctx, FRAME_W, FRAME_H);
+
+  if(photoImg){
+    ctx.save();
+    ctx.translate(FRAME_W/2 + tx, FRAME_H/2 + ty);
+    ctx.rotate(rotation);
+    ctx.scale(scale, scale);
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(photoImg, -photoImg.width/2, -photoImg.height/2);
+    ctx.restore();
+  }
+
+  // frame on top
+  if(frameImg.complete){
+    ctx.drawImage(frameImg, 0, 0, FRAME_W, FRAME_H);
+  }
+
+  // small outline showing detected hole (for debugging / polishing)
+  // (Hidden in final UI but kept commented for reference)
+  // if(holeRect){ ctx.strokeStyle='rgba(0,0,0,0.06)'; ctx.lineWidth=2; ctx.strokeRect(holeRect.x+1,holeRect.y+1,holeRect.w-2,holeRect.h-2); }
+}
+
+// load photo
+document.getElementById('photoInput').addEventListener('change', e=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  const url = URL.createObjectURL(f);
+  const img = new Image();
+  img.onload = ()=>{
+    photoImg = img;
+    autoFitToHole();
+    URL.revokeObjectURL(url);
+    draw();
+  };
+  img.src = url;
+});
+
+// auto fit logic: fit photo to holeRect (cover)
+function autoFitToHole(){
+  if(!photoImg) return;
+  const hr = holeRect || { x:0,y:0,w:FRAME_W,h:FRAME_H };
+  const s = Math.max(hr.w / photoImg.width, hr.h / photoImg.height);
+  scale = s;
+  rotation = 0;
+  // place photo center so it aligns with hole center
+  const holeCx = hr.x + hr.w/2;
+  const holeCy = hr.y + hr.h/2;
+  tx = holeCx - FRAME_W/2;
+  ty = holeCy - FRAME_H/2;
+  draw();
+}
+
+// Fit and Center buttons
+document.getElementById('fitBtn').addEventListener('click', ()=>{
+  autoFitToHole();
+});
+document.getElementById('centerBtn').addEventListener('click', ()=>{
+  tx = 0; ty = 0; rotation = 0; draw();
+});
+
+// rotate slider
+const rotateRange = document.getElementById('rotate');
+const valRot = document.getElementById('valRot');
+rotateRange.addEventListener('input', ()=>{
+  const deg = parseInt(rotateRange.value,10) || 0;
+  rotation = deg * Math.PI / 180;
+  valRot.textContent = deg + '°';
+  draw();
+});
+
+// pointer events for pan/pinch/rotate
+canvas.addEventListener('pointerdown', e=>{
+  canvas.setPointerCapture(e.pointerId);
+  pointers.set(e.pointerId, e);
+  if(pointers.size === 1){
+    lastSingle = { x: e.clientX, y: e.clientY, txStart: tx, tyStart: ty };
+  } else if(pointers.size === 2){
+    const p = Array.from(pointers.values());
+    const a = clientToCanvas(p[0].clientX, p[0].clientY);
+    const b = clientToCanvas(p[1].clientX, p[1].clientY);
+    gesture = {
+      startDist: Math.hypot(b.x-a.x, b.y-a.y),
+      startAngle: Math.atan2(b.y-a.y, b.x-a.x),
+      startScale: scale,
+      startRot: rotation,
+      startTx: tx,
+      startTy: ty,
+      startCenterCanvas: { x: (a.x+b.x)/2, y: (a.y+b.y)/2 }
+    };
+  }
+});
+
+canvas.addEventListener('pointermove', e=>{
+  if(!pointers.has(e.pointerId)) return;
+  pointers.set(e.pointerId, e);
+  if(pointers.size === 1 && lastSingle && photoImg){
+    const dx = e.clientX - lastSingle.x;
+    const dy = e.clientY - lastSingle.y;
+    // convert movement from client pixels to canvas pixels
+    const rect = canvas.getBoundingClientRect();
+    tx = lastSingle.txStart + dx * (FRAME_W / rect.width);
+    ty = lastSingle.tyStart + dy * (FRAME_H / rect.height);
+    draw();
+  } else if(pointers.size === 2 && gesture && photoImg){
+    const p = Array.from(pointers.values());
+    const a = clientToCanvas(p[0].clientX, p[0].clientY);
+    const b = clientToCanvas(p[1].clientX, p[1].clientY);
+    const dist = Math.hypot(b.x-a.x, b.y-a.y);
+    const angle = Math.atan2(b.y-a.y, b.x-a.x);
+
+    const newScale = gesture.startScale * (dist / gesture.startDist);
+    const newRot = gesture.startRot + (angle - gesture.startAngle);
+
+    // approximate center move
+    const newCenter = { x: (a.x+b.x)/2, y: (a.y+b.y)/2 };
+    const centerDelta = { x: newCenter.x - gesture.startCenterCanvas.x, y: newCenter.y - gesture.startCenterCanvas.y };
+
+    scale = Math.max(0.02, Math.min(20, newScale));
+    rotation = newRot;
+    tx = gesture.startTx + centerDelta.x;
+    ty = gesture.startTy + centerDelta.y;
+
+    draw();
+  }
+});
+
+canvas.addEventListener('pointerup', e=>{
+  pointers.delete(e.pointerId);
+  if(pointers.size < 2) gesture = null;
+  if(pointers.size === 0) lastSingle = null;
+});
+
+canvas.addEventListener('pointercancel', e=>{
+  pointers.delete(e.pointerId); gesture=null; lastSingle=null;
+});
+
+// wheel zoom (desktop)
+canvas.addEventListener('wheel', e=>{
+  if(!photoImg) return;
+  e.preventDefault();
+  const rect = canvas.getBoundingClientRect();
+  const cx = (e.clientX - rect.left) * (FRAME_W / rect.width);
+  const cy = (e.clientY - rect.top) * (FRAME_H / rect.height);
+  const prevScale = scale;
+  const zoom = Math.exp(-e.deltaY * 0.0014);
+  const newScale = Math.max(0.02, Math.min(30, scale * zoom));
+  // keep zoom centered at mouse position
+  const beforeX = (cx - (FRAME_W/2 + tx)) / prevScale;
+  const beforeY = (cy - (FRAME_H/2 + ty)) / prevScale;
+  const afterX = beforeX * newScale;
+  const afterY = beforeY * newScale;
+  tx += (afterX - beforeX);
+  ty += (afterY - beforeY);
+  scale = newScale;
+  draw();
+},{ passive:false });
+
+// download: draw to offscreen canvas at exact FRAME_W x FRAME_H and export
+document.getElementById('downloadBtn').addEventListener('click', ()=>{
+  if(!frameImg.complete){ alert('Frame not loaded yet.'); return; }
+
+  const mime = document.getElementById('format').value === 'jpg' ? 'image/jpeg' : 'image/png';
+  const out = document.createElement('canvas');
+  out.width = FRAME_W; out.height = FRAME_H;
+  const octx = out.getContext('2d');
+
+  // paint golden background (explicit)
+  paintGoldenBackground(octx, FRAME_W, FRAME_H);
+
+  // draw photo transform
+  if(photoImg){
+    octx.save();
+    octx.translate(FRAME_W/2 + tx, FRAME_H/2 + ty);
+    octx.rotate(rotation);
+    octx.scale(scale, scale);
+    octx.imageSmoothingEnabled = true;
+    octx.drawImage(photoImg, -photoImg.width/2, -photoImg.height/2);
+    octx.restore();
+  }
+
+  // draw frame
+  octx.drawImage(frameImg, 0, 0, FRAME_W, FRAME_H);
+
+  out.toBlob(blob=>{
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `AAB-framed-${Date.now()}.${mime==='image/png' ? 'png' : 'jpg'}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(a.href);
+  }, mime, 0.95);
+});
+
+// small helper to center & initial draw
+function ensureDefaults(){
+  if(!photoImg){
+    // just draw golden bg + frame
+    draw();
+  }
+}
+ensureDefaults();
+</script>
+</body>
+</html>
